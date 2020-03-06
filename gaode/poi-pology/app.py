@@ -8,6 +8,7 @@ from urllib.parse import quote
 from urllib import request
 import json
 import xlwt
+import xlrd
 from xpinyin import Pinyin
 import os
 from transCoordinateSystem import gcj02_to_wgs84, gcj02_to_bd09
@@ -23,18 +24,18 @@ import requests
 #################################################需要修改###########################################################
 
 ## TODO 1.划分的网格距离，0.02-0.05最佳，建议如果是数量比较多的用0.01或0.02，如餐厅，企业。数据量少的用0.05或者更大，如大学
-pology_split_distance = 0.5
+pology_split_distance = 0.01
 
 
 ## TODO 2. 城市编码，参见高德城市编码表
-city_code = '810000'
+city_code = '310110'  ##杨浦区
 
 
 ## TODO 3. POI类型编码，类型名或者编码都行，具体参见《高德地图POI分类编码表.xlsx》
-typs = ['企业']
+typs = ['商务住宅']
 
 ## TODO 4. 高德开放平台密钥
-gaode_key = ['3a3ccf69cf7b5bab75a68948d8fcad4b', '930433cddfe95996550f42235c0095cc']
+gaode_key = ['47502842153a375fd479560f9da9e2ac']
 
 
 # TODO 5.输出数据坐标系,1为高德GCJ20坐标系，2WGS84坐标系，3百度BD09坐标系
@@ -89,6 +90,13 @@ def getpois(grids, keywords):
     return poilist
 
 
+
+
+
+
+
+
+
 # 数据写入excel
 def write_to_excel(poilist, citycode, classfield, coord):
     # 一个Workbook对象，这就相当于创建了一个Excel文件
@@ -124,7 +132,7 @@ def write_to_excel(poilist, citycode, classfield, coord):
         adname = poilist[i]['adname']
 
         #根据adcode判断当前数据是否属于当前所需要的城市 根据城市编码前四位判断
-        if adcode[:3] != citycode[:3]:
+        if adcode[:6] != citycode[:6]:
             continue
         lng = str(location).split(",")[0]
         lat = str(location).split(",")[1]
@@ -216,6 +224,9 @@ def get_drids(min_lng, max_lat, max_lng, min_lat, keyword, key, pology_split_dis
     return all_grids
 
 
+
+
+
 def get_data(city, keyword, coord):
 
     # 1. 获取城市边界的最大、最小经纬度
@@ -241,7 +252,6 @@ def get_data(city, keyword, coord):
         # grid格式：[112.23, 23.23, 112.24, 23.22]
         one_pology_data = getpois(grid, keyword)
 
-
         print('===================================当前矩形范围：', grid, '总共：',
               str(len(one_pology_data)) + "条数据.............................")
 
@@ -259,4 +269,5 @@ if __name__ == '__main__':
 
     for type in typs:
         get_data(city_code, type, coord)
+
 
